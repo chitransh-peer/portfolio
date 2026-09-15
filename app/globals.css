@@ -1,0 +1,653 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------
+   Palette
+   Colours live as raw RGB channels so Tailwind opacity modifiers
+   (bg-signal/10) and hand-written rgb(... / .3) both work off one
+   source. Light mode only has to redefine the channels.
+   ------------------------------------------------------------------ */
+:root {
+  --page-rgb: 7 8 15;
+  --surface-rgb: 14 16 24;
+  --hairline-rgb: 28 32 48;
+  --primary-rgb: 228 237 251;
+  --muted-rgb: 124 132 153;
+
+  /* Neon cyan carries the UI: borders, links, buttons, focus. */
+  --signal-rgb: 0 229 255;
+  /* Text/icon colour that sits on top of a signal-filled surface. */
+  --on-signal-rgb: 4 6 13;
+  /* Acid yellow — reserved for the headline keyword and live status. */
+  --acid-rgb: 252 238 10;
+  /* Magenta stays atmospheric: ambient glow and glitch only. */
+  --magenta-rgb: 255 46 136;
+
+  --success-rgb: 61 255 162;
+  --upcoming-rgb: 90 99 117;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out: cubic-bezier(0.83, 0, 0.17, 1);
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --dur-1: 150ms;
+  --dur-2: 250ms;
+  --dur-3: 400ms;
+  --dur-4: 650ms;
+
+  --grid-line: rgb(var(--signal-rgb) / 0.07);
+  --grain-opacity: 0.04;
+  --scanline-opacity: 0.4;
+}
+
+body.light {
+  --page-rgb: 237 239 245;
+  --surface-rgb: 255 255 255;
+  --hairline-rgb: 203 211 227;
+  --primary-rgb: 10 12 20;
+  --muted-rgb: 88 97 116;
+
+  /* Deepened so cyan still passes as text and as a button fill. */
+  --signal-rgb: 6 132 163;
+  --on-signal-rgb: 255 255 255;
+  --acid-rgb: 152 138 0;
+  --magenta-rgb: 214 31 105;
+
+  --success-rgb: 5 150 105;
+  --upcoming-rgb: 120 130 150;
+
+  --grid-line: rgb(var(--signal-rgb) / 0.09);
+  --grain-opacity: 0.022;
+  --scanline-opacity: 0.22;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Sticky navbar is ~65px — keep anchor targets clear of it. */
+  scroll-padding-top: 6rem;
+}
+
+body {
+  background-color: rgb(var(--page-rgb));
+  color: rgb(var(--primary-rgb));
+  /* Rajdhani runs narrow; a touch of tracking keeps body copy open. */
+  letter-spacing: 0.012em;
+  transition: background-color var(--dur-3) var(--ease-out), color var(--dur-3) var(--ease-out);
+}
+
+::selection {
+  background-color: rgb(var(--signal-rgb));
+  color: rgb(var(--on-signal-rgb));
+}
+
+/* Display type is wide and angular — pull it in slightly. */
+.font-display {
+  letter-spacing: -0.015em;
+}
+
+/* ------------------------------------------------------------------
+   Semantic surfaces
+   ------------------------------------------------------------------ */
+.surface-card {
+  background-color: rgb(var(--surface-rgb));
+  border: 1px solid rgb(var(--hairline-rgb));
+}
+
+.surface-page {
+  background-color: rgb(var(--page-rgb));
+}
+
+/* Sections are translucent so the aurora bleeds through the whole page. */
+.surface-page--sheer {
+  background-color: transparent;
+}
+
+.hairline {
+  border-color: rgb(var(--hairline-rgb));
+}
+
+.text-primary {
+  color: rgb(var(--primary-rgb));
+}
+
+.text-muted {
+  color: rgb(var(--muted-rgb));
+}
+
+/* ------------------------------------------------------------------
+   Accent button: neon fill with a halo that intensifies on hover
+   ------------------------------------------------------------------ */
+.btn-accent {
+  background-color: rgb(var(--signal-rgb));
+  color: rgb(var(--on-signal-rgb));
+  box-shadow: 0 0 18px rgb(var(--signal-rgb) / 0.35);
+  transition: box-shadow var(--dur-3) var(--ease-out), background-color var(--dur-2) var(--ease-out);
+}
+
+.btn-accent:hover,
+.btn-accent:focus-visible {
+  box-shadow: 0 0 6px rgb(var(--signal-rgb) / 0.5), 0 0 30px rgb(var(--signal-rgb) / 0.55);
+}
+
+/* ------------------------------------------------------------------
+   Ambient backdrop: aurora, blueprint grid, CRT scanlines, grain
+   ------------------------------------------------------------------ */
+.ambient-root {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Wrapper owns the scroll parallax; the blob inside owns the CSS drift.
+   Splitting them keeps two animations off the same `transform`. */
+.aurora-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  will-change: transform;
+}
+
+.aurora-blob--signal {
+  top: -18vh;
+  right: -10vw;
+  width: 58vw;
+  height: 58vw;
+  background: radial-gradient(circle, rgb(var(--signal-rgb) / 0.2) 0%, transparent 68%);
+  animation: aurora-drift-a 26s var(--ease-in-out) infinite;
+}
+
+.aurora-blob--cool {
+  top: 24vh;
+  left: -16vw;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgb(var(--magenta-rgb) / 0.17) 0%, transparent 68%);
+  animation: aurora-drift-b 34s var(--ease-in-out) infinite;
+}
+
+@keyframes aurora-drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(-7%, 6%, 0) scale(1.14);
+  }
+  66% {
+    transform: translate3d(5%, -5%, 0) scale(0.92);
+  }
+}
+
+@keyframes aurora-drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.05);
+  }
+  40% {
+    transform: translate3d(9%, -7%, 0) scale(0.9);
+  }
+  70% {
+    transform: translate3d(-4%, 8%, 0) scale(1.16);
+  }
+}
+
+.blueprint-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 55% at 50% 0%, #000 25%, transparent 78%);
+  mask-image: radial-gradient(ellipse 90% 55% at 50% 0%, #000 25%, transparent 78%);
+}
+
+/* CRT line structure over the whole page. */
+.crt-scanlines {
+  position: absolute;
+  inset: 0;
+  opacity: var(--scanline-opacity);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgb(var(--signal-rgb) / 0.05) 0px,
+    rgb(var(--signal-rgb) / 0.05) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+
+.film-grain {
+  position: absolute;
+  inset: -50%;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 6s steps(6) infinite;
+}
+
+@keyframes grain-shift {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-3%, 4%);
+  }
+  40% {
+    transform: translate(4%, -2%);
+  }
+  60% {
+    transform: translate(-2%, -4%);
+  }
+  80% {
+    transform: translate(3%, 3%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Navbar shell: transparent at rest, frosted once the page scrolls
+   ------------------------------------------------------------------ */
+.nav-shell {
+  border-bottom: 1px solid transparent;
+  transition: background-color var(--dur-3) var(--ease-out),
+    border-color var(--dur-3) var(--ease-out), backdrop-filter var(--dur-3) var(--ease-out);
+}
+
+.nav-shell--scrolled {
+  background-color: rgb(var(--page-rgb) / 0.72);
+  border-bottom-color: rgb(var(--signal-rgb) / 0.28);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+}
+
+/* ------------------------------------------------------------------
+   Hero headline: glow field, accent keyword, caret, RGB-split glitch
+   ------------------------------------------------------------------ */
+.hero-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(900px, 96vw);
+  height: min(460px, 60vh);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  filter: blur(64px);
+  background: radial-gradient(
+    ellipse at center,
+    rgb(var(--signal-rgb) / 0.3) 0%,
+    rgb(var(--magenta-rgb) / 0.13) 42%,
+    transparent 72%
+  );
+  animation: hero-glow-pulse 7s var(--ease-in-out) infinite;
+}
+
+@keyframes hero-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+.accent-glow {
+  color: rgb(var(--acid-rgb));
+  text-shadow: 0 0 6px rgb(var(--acid-rgb) / 0.6), 0 0 34px rgb(var(--acid-rgb) / 0.45);
+}
+
+body.light .accent-glow {
+  text-shadow: 0 0 22px rgb(var(--acid-rgb) / 0.3);
+}
+
+/* Caret sized in em so it tracks the headline's responsive font size. */
+.type-caret {
+  display: inline-block;
+  width: 0.055em;
+  height: 0.82em;
+  margin-left: 0.07em;
+  vertical-align: baseline;
+  background-color: rgb(var(--signal-rgb));
+  box-shadow: 0 0 14px rgb(var(--signal-rgb) / 0.85);
+  animation: caret-blink 1.05s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Two offset copies of the headline that snap through horizontal bands,
+   producing a chromatic tear. Idle most of the cycle, then a short burst. */
+.glitch-layer {
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, clip-path;
+  mix-blend-mode: screen;
+}
+
+body.light .glitch-layer {
+  mix-blend-mode: multiply;
+}
+
+.glitch-layer--a {
+  color: rgb(var(--signal-rgb));
+  animation: glitch-a 6s steps(1) infinite;
+}
+
+.glitch-layer--b {
+  color: rgb(var(--magenta-rgb));
+  animation: glitch-b 6s steps(1) infinite;
+}
+
+@keyframes glitch-a {
+  0%,
+  86%,
+  94%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  87% {
+    opacity: 0.9;
+    clip-path: inset(10% 0 70% 0);
+    transform: translate3d(-4px, 0, 0);
+  }
+  89% {
+    opacity: 0.9;
+    clip-path: inset(46% 0 36% 0);
+    transform: translate3d(5px, 0, 0);
+  }
+  91% {
+    opacity: 0.9;
+    clip-path: inset(74% 0 8% 0);
+    transform: translate3d(-3px, 0, 0);
+  }
+}
+
+@keyframes glitch-b {
+  0%,
+  86%,
+  95%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  88% {
+    opacity: 0.85;
+    clip-path: inset(28% 0 54% 0);
+    transform: translate3d(4px, 0, 0);
+  }
+  90% {
+    opacity: 0.85;
+    clip-path: inset(60% 0 22% 0);
+    transform: translate3d(-5px, 0, 0);
+  }
+  92% {
+    opacity: 0.85;
+    clip-path: inset(4% 0 84% 0);
+    transform: translate3d(3px, 0, 0);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Reusable interaction treatments
+   ------------------------------------------------------------------ */
+
+/* Light sweeps across a filled button on hover. */
+.sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 68%
+  );
+  transform: translateX(-130%);
+  pointer-events: none;
+}
+
+.sheen:hover::after,
+.sheen:focus-visible::after {
+  animation: sheen-sweep 900ms var(--ease-out);
+}
+
+@keyframes sheen-sweep {
+  to {
+    transform: translateX(130%);
+  }
+}
+
+/* Underline that draws in from the left rather than snapping on. */
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size var(--dur-3) var(--ease-out), color var(--dur-2) var(--ease-out);
+}
+
+.link-underline:hover,
+.link-underline:focus-visible {
+  background-size: 100% 1px;
+}
+
+/* Cursor-tracked spotlight on cards. Position comes from JS via --mx/--my. */
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    380px circle at var(--mx, 50%) var(--my, 50%),
+    rgb(var(--signal-rgb) / 0.12),
+    transparent 62%
+  );
+  transition: opacity var(--dur-3) var(--ease-out);
+}
+
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+/* HUD targeting brackets that snap onto a card's opposite corners. */
+.hud-corners {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-3) var(--ease-out);
+}
+
+.group:hover .hud-corners {
+  opacity: 1;
+}
+
+.hud-corners::before,
+.hud-corners::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: rgb(var(--signal-rgb));
+}
+
+.hud-corners::before {
+  top: 0;
+  left: 0;
+  border-top: 1px solid;
+  border-left: 1px solid;
+}
+
+.hud-corners::after {
+  right: 0;
+  bottom: 0;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+}
+
+/* Soft elevation for interactive cards. Paired with the tilt in JS. */
+.card-lift {
+  transition: border-color var(--dur-3) var(--ease-out), box-shadow var(--dur-3) var(--ease-out);
+}
+
+.card-lift:hover {
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgb(var(--signal-rgb) / 0.3), 0 0 26px -6px rgb(var(--signal-rgb) / 0.3);
+}
+
+/* Form fields: replace the generic focus outline with a neon ring. */
+.field {
+  transition: border-color var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
+}
+
+.field:focus,
+.field:focus-visible {
+  outline: none;
+  border-color: rgb(var(--signal-rgb));
+  box-shadow: 0 0 0 3px rgb(var(--signal-rgb) / 0.2), 0 0 16px rgb(var(--signal-rgb) / 0.25);
+}
+
+/* Status dot halo for live/in-progress work. */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  70%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.pulse-ring::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background-color: currentColor;
+  animation: pulse-ring 2s var(--ease-out) infinite;
+}
+
+/* ------------------------------------------------------------------
+   Scrollbar
+   ------------------------------------------------------------------ */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--hairline-rgb));
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--signal-rgb));
+  background-clip: content-box;
+}
+
+/* ------------------------------------------------------------------
+   Theme change: circular wipe via the View Transitions API.
+   ------------------------------------------------------------------ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--signal-rgb));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ------------------------------------------------------------------
+   Reduced motion: strip ambient loops entirely, not just shorten them.
+   Framer is handled separately via MotionConfig reducedMotion="user".
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .aurora-blob,
+  .film-grain,
+  .hero-glow,
+  .pulse-ring::after,
+  .type-caret,
+  .glitch-layer--a,
+  .glitch-layer--b {
+    animation: none !important;
+  }
+
+  .film-grain,
+  .glitch-layer {
+    display: none;
+  }
+}
+
+/* Logo swap. The lockup ships as two PNGs — white type for the dark
+   theme, original navy for the light one — toggled here rather than in
+   React so the correct cut is painted on the first frame. */
+.logo-on-light {
+  display: none;
+}
+
+body.light .logo-on-light {
+  display: block;
+}
+
+body.light .logo-on-dark {
+  display: none;
+}
