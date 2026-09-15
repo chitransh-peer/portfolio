@@ -1,27 +1,24 @@
 import type { Metadata } from "next";
-import { Chakra_Petch, Rajdhani, Share_Tech_Mono } from "next/font/google";
+import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/motion/Providers";
 
-/* Angular, bevelled display face — the cut-corner look of HUD type. */
-const display = Chakra_Petch({
+const display = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["500", "600", "700"],
+  weight: ["500", "700"],
 });
 
-/* Squared-off and slightly condensed; reads as instrumentation. */
-const body = Rajdhani({
+const body = Inter({
   subsets: ["latin"],
   variable: "--font-body",
   weight: ["400", "500", "600"],
 });
 
-/* Terminal face for labels, chips, and the status rows. */
-const mono = Share_Tech_Mono({
+const mono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-  weight: ["400"],
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {

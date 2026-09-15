@@ -87,8 +87,6 @@ export default function Typewriter({
     );
   });
 
-  const finished = count >= full.length;
-
   return (
     <h1 className={`relative grid ${className ?? ""}`}>
       {/* Screen readers get the finished line, not a half-typed one. */}
@@ -102,26 +100,6 @@ export default function Typewriter({
         {typed}
         <span className="type-caret" />
       </span>
-
-      {/* Chromatic tear. Held back until the line has landed, so the
-          glitch never competes with the typing for attention. The copies
-          are deliberately unstyled — each layer is a single colour. */}
-      {finished && (
-        <>
-          <span
-            aria-hidden="true"
-            className="glitch-layer glitch-layer--a col-start-1 row-start-1"
-          >
-            {full}
-          </span>
-          <span
-            aria-hidden="true"
-            className="glitch-layer glitch-layer--b col-start-1 row-start-1"
-          >
-            {full}
-          </span>
-        </>
-      )}
     </h1>
   );
 }

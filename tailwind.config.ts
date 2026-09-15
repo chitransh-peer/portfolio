@@ -19,10 +19,8 @@ const config: Config = {
         muted: channel("--muted-rgb"),
         signal: channel("--signal-rgb"),
         "on-signal": channel("--on-signal-rgb"),
-        acid: channel("--acid-rgb"),
-        magenta: channel("--magenta-rgb"),
         success: channel("--success-rgb"),
-        progress: channel("--acid-rgb"),
+        progress: channel("--signal-rgb"),
         upcoming: channel("--upcoming-rgb"),
       },
       fontFamily: {
@@ -34,8 +32,7 @@ const config: Config = {
         content: "1180px",
       },
       borderRadius: {
-        /* Cyberpunk panels read as cut metal, not soft cards. */
-        card: "3px",
+        card: "10px",
       },
     },
   },

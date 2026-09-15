@@ -64,8 +64,6 @@ export default function ProjectCard({
       transition={SPRING.pointer}
       className="spotlight card-lift surface-card hairline group relative flex h-full flex-col overflow-hidden rounded-card border hover:border-signal"
     >
-      <span aria-hidden="true" className="hud-corners" />
-
       <div className="relative h-40 w-full overflow-hidden">
         {/* Shared element: this same layoutId appears in the modal, so the
             thumbnail flies into place instead of the modal popping open. */}

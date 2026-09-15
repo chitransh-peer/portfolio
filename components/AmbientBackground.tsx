@@ -36,7 +36,6 @@ export default function AmbientBackground() {
 
       <motion.div className="blueprint-grid" style={{ opacity: gridOpacity }} />
 
-      <div className="crt-scanlines" />
       <div className="film-grain" />
     </div>
   );

@@ -9,23 +9,19 @@
    source. Light mode only has to redefine the channels.
    ------------------------------------------------------------------ */
 :root {
-  --page-rgb: 7 8 15;
-  --surface-rgb: 14 16 24;
-  --hairline-rgb: 28 32 48;
-  --primary-rgb: 228 237 251;
-  --muted-rgb: 124 132 153;
+  --page-rgb: 13 14 16;
+  --surface-rgb: 26 28 31;
+  --hairline-rgb: 42 45 49;
+  --primary-rgb: 244 242 236;
+  --muted-rgb: 139 141 147;
 
-  /* Neon cyan carries the UI: borders, links, buttons, focus. */
-  --signal-rgb: 0 229 255;
+  /* Warm amber carries the UI: borders, links, buttons, focus. */
+  --signal-rgb: 232 163 61;
   /* Text/icon colour that sits on top of a signal-filled surface. */
-  --on-signal-rgb: 4 6 13;
-  /* Acid yellow — reserved for the headline keyword and live status. */
-  --acid-rgb: 252 238 10;
-  /* Magenta stays atmospheric: ambient glow and glitch only. */
-  --magenta-rgb: 255 46 136;
+  --on-signal-rgb: 13 14 16;
 
-  --success-rgb: 61 255 162;
-  --upcoming-rgb: 90 99 117;
+  --success-rgb: 95 174 121;
+  --upcoming-rgb: 107 110 118;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
@@ -37,30 +33,31 @@
   --dur-3: 400ms;
   --dur-4: 650ms;
 
-  --grid-line: rgb(var(--signal-rgb) / 0.07);
-  --grain-opacity: 0.04;
-  --scanline-opacity: 0.4;
+  --grid-line: rgba(255, 255, 255, 0.045);
+  --glow-signal: 0.22;
+  --glow-cool: 0.14;
+  --grain-opacity: 0.035;
+  --spotlight-alpha: 0.1;
 }
 
 body.light {
-  --page-rgb: 237 239 245;
+  --page-rgb: 244 242 236;
   --surface-rgb: 255 255 255;
-  --hairline-rgb: 203 211 227;
-  --primary-rgb: 10 12 20;
-  --muted-rgb: 88 97 116;
+  --hairline-rgb: 227 224 214;
+  --primary-rgb: 13 14 16;
+  --muted-rgb: 107 109 115;
 
-  /* Deepened so cyan still passes as text and as a button fill. */
-  --signal-rgb: 6 132 163;
-  --on-signal-rgb: 255 255 255;
-  --acid-rgb: 152 138 0;
-  --magenta-rgb: 214 31 105;
+  --signal-rgb: 232 163 61;
+  --on-signal-rgb: 13 14 16;
 
-  --success-rgb: 5 150 105;
-  --upcoming-rgb: 120 130 150;
+  --success-rgb: 95 174 121;
+  --upcoming-rgb: 107 110 118;
 
-  --grid-line: rgb(var(--signal-rgb) / 0.09);
-  --grain-opacity: 0.022;
-  --scanline-opacity: 0.22;
+  --grid-line: rgba(13, 14, 16, 0.05);
+  --glow-signal: 0.28;
+  --glow-cool: 0.16;
+  --grain-opacity: 0.02;
+  --spotlight-alpha: 0.14;
 }
 
 html {
@@ -72,19 +69,12 @@ html {
 body {
   background-color: rgb(var(--page-rgb));
   color: rgb(var(--primary-rgb));
-  /* Rajdhani runs narrow; a touch of tracking keeps body copy open. */
-  letter-spacing: 0.012em;
   transition: background-color var(--dur-3) var(--ease-out), color var(--dur-3) var(--ease-out);
 }
 
 ::selection {
   background-color: rgb(var(--signal-rgb));
   color: rgb(var(--on-signal-rgb));
-}
-
-/* Display type is wide and angular — pull it in slightly. */
-.font-display {
-  letter-spacing: -0.015em;
 }
 
 /* ------------------------------------------------------------------
@@ -117,22 +107,16 @@ body {
 }
 
 /* ------------------------------------------------------------------
-   Accent button: neon fill with a halo that intensifies on hover
+   Accent button
    ------------------------------------------------------------------ */
 .btn-accent {
   background-color: rgb(var(--signal-rgb));
   color: rgb(var(--on-signal-rgb));
-  box-shadow: 0 0 18px rgb(var(--signal-rgb) / 0.35);
-  transition: box-shadow var(--dur-3) var(--ease-out), background-color var(--dur-2) var(--ease-out);
-}
-
-.btn-accent:hover,
-.btn-accent:focus-visible {
-  box-shadow: 0 0 6px rgb(var(--signal-rgb) / 0.5), 0 0 30px rgb(var(--signal-rgb) / 0.55);
+  transition: background-color var(--dur-2) var(--ease-out);
 }
 
 /* ------------------------------------------------------------------
-   Ambient backdrop: aurora, blueprint grid, CRT scanlines, grain
+   Ambient backdrop: drifting aurora, blueprint grid, film grain
    ------------------------------------------------------------------ */
 .ambient-root {
   position: fixed;
@@ -162,7 +146,11 @@ body {
   right: -10vw;
   width: 58vw;
   height: 58vw;
-  background: radial-gradient(circle, rgb(var(--signal-rgb) / 0.2) 0%, transparent 68%);
+  background: radial-gradient(
+    circle,
+    rgb(var(--signal-rgb) / var(--glow-signal)) 0%,
+    transparent 68%
+  );
   animation: aurora-drift-a 26s var(--ease-in-out) infinite;
 }
 
@@ -171,7 +159,11 @@ body {
   left: -16vw;
   width: 50vw;
   height: 50vw;
-  background: radial-gradient(circle, rgb(var(--magenta-rgb) / 0.17) 0%, transparent 68%);
+  background: radial-gradient(
+    circle,
+    rgb(var(--success-rgb) / var(--glow-cool)) 0%,
+    transparent 68%
+  );
   animation: aurora-drift-b 34s var(--ease-in-out) infinite;
 }
 
@@ -209,20 +201,6 @@ body {
   background-size: 72px 72px;
   -webkit-mask-image: radial-gradient(ellipse 90% 55% at 50% 0%, #000 25%, transparent 78%);
   mask-image: radial-gradient(ellipse 90% 55% at 50% 0%, #000 25%, transparent 78%);
-}
-
-/* CRT line structure over the whole page. */
-.crt-scanlines {
-  position: absolute;
-  inset: 0;
-  opacity: var(--scanline-opacity);
-  background-image: repeating-linear-gradient(
-    to bottom,
-    rgb(var(--signal-rgb) / 0.05) 0px,
-    rgb(var(--signal-rgb) / 0.05) 1px,
-    transparent 1px,
-    transparent 4px
-  );
 }
 
 .film-grain {
@@ -265,13 +243,13 @@ body {
 
 .nav-shell--scrolled {
   background-color: rgb(var(--page-rgb) / 0.72);
-  border-bottom-color: rgb(var(--signal-rgb) / 0.28);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  backdrop-filter: blur(16px) saturate(150%);
+  border-bottom-color: rgb(var(--hairline-rgb));
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
 }
 
 /* ------------------------------------------------------------------
-   Hero headline: glow field, accent keyword, caret, RGB-split glitch
+   Hero headline: glow field, accent keyword, typing caret
    ------------------------------------------------------------------ */
 .hero-glow {
   position: absolute;
@@ -284,17 +262,26 @@ body {
   filter: blur(64px);
   background: radial-gradient(
     ellipse at center,
-    rgb(var(--signal-rgb) / 0.3) 0%,
-    rgb(var(--magenta-rgb) / 0.13) 42%,
+    rgb(var(--signal-rgb) / 0.26) 0%,
+    rgb(var(--signal-rgb) / 0.09) 40%,
     transparent 72%
   );
   animation: hero-glow-pulse 7s var(--ease-in-out) infinite;
 }
 
+body.light .hero-glow {
+  background: radial-gradient(
+    ellipse at center,
+    rgb(var(--signal-rgb) / 0.34) 0%,
+    rgb(var(--signal-rgb) / 0.12) 40%,
+    transparent 72%
+  );
+}
+
 @keyframes hero-glow-pulse {
   0%,
   100% {
-    opacity: 0.7;
+    opacity: 0.72;
     transform: translate(-50%, -50%) scale(1);
   }
   50% {
@@ -303,13 +290,14 @@ body {
   }
 }
 
+/* Highlighted keyword inside the headline. */
 .accent-glow {
-  color: rgb(var(--acid-rgb));
-  text-shadow: 0 0 6px rgb(var(--acid-rgb) / 0.6), 0 0 34px rgb(var(--acid-rgb) / 0.45);
+  color: rgb(var(--signal-rgb));
+  text-shadow: 0 0 32px rgb(var(--signal-rgb) / 0.5);
 }
 
 body.light .accent-glow {
-  text-shadow: 0 0 22px rgb(var(--acid-rgb) / 0.3);
+  text-shadow: 0 0 26px rgb(var(--signal-rgb) / 0.42);
 }
 
 /* Caret sized in em so it tracks the headline's responsive font size. */
@@ -320,7 +308,7 @@ body.light .accent-glow {
   margin-left: 0.07em;
   vertical-align: baseline;
   background-color: rgb(var(--signal-rgb));
-  box-shadow: 0 0 14px rgb(var(--signal-rgb) / 0.85);
+  box-shadow: 0 0 14px rgb(var(--signal-rgb) / 0.75);
   animation: caret-blink 1.05s steps(1) infinite;
 }
 
@@ -332,79 +320,6 @@ body.light .accent-glow {
   50%,
   100% {
     opacity: 0;
-  }
-}
-
-/* Two offset copies of the headline that snap through horizontal bands,
-   producing a chromatic tear. Idle most of the cycle, then a short burst. */
-.glitch-layer {
-  pointer-events: none;
-  opacity: 0;
-  will-change: transform, clip-path;
-  mix-blend-mode: screen;
-}
-
-body.light .glitch-layer {
-  mix-blend-mode: multiply;
-}
-
-.glitch-layer--a {
-  color: rgb(var(--signal-rgb));
-  animation: glitch-a 6s steps(1) infinite;
-}
-
-.glitch-layer--b {
-  color: rgb(var(--magenta-rgb));
-  animation: glitch-b 6s steps(1) infinite;
-}
-
-@keyframes glitch-a {
-  0%,
-  86%,
-  94%,
-  100% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0);
-  }
-  87% {
-    opacity: 0.9;
-    clip-path: inset(10% 0 70% 0);
-    transform: translate3d(-4px, 0, 0);
-  }
-  89% {
-    opacity: 0.9;
-    clip-path: inset(46% 0 36% 0);
-    transform: translate3d(5px, 0, 0);
-  }
-  91% {
-    opacity: 0.9;
-    clip-path: inset(74% 0 8% 0);
-    transform: translate3d(-3px, 0, 0);
-  }
-}
-
-@keyframes glitch-b {
-  0%,
-  86%,
-  95%,
-  100% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0);
-  }
-  88% {
-    opacity: 0.85;
-    clip-path: inset(28% 0 54% 0);
-    transform: translate3d(4px, 0, 0);
-  }
-  90% {
-    opacity: 0.85;
-    clip-path: inset(60% 0 22% 0);
-    transform: translate3d(-5px, 0, 0);
-  }
-  92% {
-    opacity: 0.85;
-    clip-path: inset(4% 0 84% 0);
-    transform: translate3d(3px, 0, 0);
   }
 }
 
@@ -469,7 +384,7 @@ body.light .glitch-layer {
   z-index: 1;
   background: radial-gradient(
     380px circle at var(--mx, 50%) var(--my, 50%),
-    rgb(var(--signal-rgb) / 0.12),
+    rgb(var(--signal-rgb) / var(--spotlight-alpha)),
     transparent 62%
   );
   transition: opacity var(--dur-3) var(--ease-out);
@@ -479,54 +394,23 @@ body.light .glitch-layer {
   opacity: 1;
 }
 
-/* HUD targeting brackets that snap onto a card's opposite corners. */
-.hud-corners {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--dur-3) var(--ease-out);
-}
-
-.group:hover .hud-corners {
-  opacity: 1;
-}
-
-.hud-corners::before,
-.hud-corners::after {
-  content: "";
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border-color: rgb(var(--signal-rgb));
-}
-
-.hud-corners::before {
-  top: 0;
-  left: 0;
-  border-top: 1px solid;
-  border-left: 1px solid;
-}
-
-.hud-corners::after {
-  right: 0;
-  bottom: 0;
-  border-right: 1px solid;
-  border-bottom: 1px solid;
-}
-
 /* Soft elevation for interactive cards. Paired with the tilt in JS. */
 .card-lift {
   transition: border-color var(--dur-3) var(--ease-out), box-shadow var(--dur-3) var(--ease-out);
 }
 
 .card-lift:hover {
-  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgb(var(--signal-rgb) / 0.3), 0 0 26px -6px rgb(var(--signal-rgb) / 0.3);
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgb(var(--signal-rgb) / 0.18);
 }
 
-/* Form fields: replace the generic focus outline with a neon ring. */
+body.light .card-lift:hover {
+  box-shadow: 0 18px 40px -20px rgba(13, 14, 16, 0.22),
+    0 0 0 1px rgb(var(--signal-rgb) / 0.28);
+}
+
+/* Form fields: replace the generic focus outline with a signal ring that
+   eases in, matching the rest of the motion system. */
 .field {
   transition: border-color var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
 }
@@ -535,7 +419,7 @@ body.light .glitch-layer {
 .field:focus-visible {
   outline: none;
   border-color: rgb(var(--signal-rgb));
-  box-shadow: 0 0 0 3px rgb(var(--signal-rgb) / 0.2), 0 0 16px rgb(var(--signal-rgb) / 0.25);
+  box-shadow: 0 0 0 3px rgb(var(--signal-rgb) / 0.16);
 }
 
 /* Status dot halo for live/in-progress work. */
@@ -625,14 +509,11 @@ body.light .glitch-layer {
   .film-grain,
   .hero-glow,
   .pulse-ring::after,
-  .type-caret,
-  .glitch-layer--a,
-  .glitch-layer--b {
+  .type-caret {
     animation: none !important;
   }
 
-  .film-grain,
-  .glitch-layer {
+  .film-grain {
     display: none;
   }
 }

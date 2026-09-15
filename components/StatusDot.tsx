@@ -8,7 +8,7 @@ const labels: Record<ProjectStatus, string> = {
 
 const colors: Record<ProjectStatus, string> = {
   completed: "bg-success",
-  "in-progress": "bg-acid",
+  "in-progress": "bg-signal",
   upcoming: "bg-upcoming",
 };
 
@@ -19,7 +19,7 @@ export default function StatusDot({ status }: { status: ProjectStatus }) {
         {/* Only live work gets the halo — it earns attention, finished
             work shouldn't compete for it. */}
         {status === "in-progress" && (
-          <span className="pulse-ring absolute inset-0 rounded-full text-acid" />
+          <span className="pulse-ring absolute inset-0 rounded-full text-signal" />
         )}
         <span className={`relative h-1.5 w-1.5 rounded-full ${colors[status]}`} />
       </span>

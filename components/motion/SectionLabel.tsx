@@ -31,13 +31,7 @@ export default function SectionLabel({
         className="shrink-0 font-mono text-[11px] uppercase tracking-[0.18em] text-signal"
         variants={revealItem}
       >
-        <span aria-hidden="true" className="opacity-50">
-          [
-        </span>
-        <span className="px-1.5">{children}</span>
-        <span aria-hidden="true" className="opacity-50">
-          ]
-        </span>
+        {children}
       </motion.span>
       <motion.span
         aria-hidden="true"
