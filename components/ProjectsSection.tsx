@@ -14,9 +14,10 @@ import { Reveal } from "./motion/Reveal";
 
 const filters: { label: string; value: ProjectCategory | "all" }[] = [
   { label: "All", value: "all" },
-  { label: "Web", value: "web" },
-  { label: "Mobile", value: "mobile" },
+  { label: "Platforms", value: "web" },
+  { label: "Websites", value: "website" },
   { label: "AI / ML", value: "ai-ml" },
+  { label: "Mobile", value: "mobile" },
   { label: "Other", value: "other" },
 ];
 

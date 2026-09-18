@@ -1,6 +1,6 @@
 export type ProjectStatus = "completed" | "in-progress" | "upcoming";
 
-export type ProjectCategory = "web" | "mobile" | "ai-ml" | "other";
+export type ProjectCategory = "web" | "website" | "mobile" | "ai-ml" | "other";
 
 export interface Project {
   slug: string;
