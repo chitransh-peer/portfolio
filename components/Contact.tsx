@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Mail, Phone, MapPin, Linkedin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, Send, Loader2, ChevronDown } from "lucide-react";
 import { EASE, SPRING, VIEWPORT, revealGroup, revealItem } from "@/lib/motion";
 import SectionLabel from "./motion/SectionLabel";
 import TextReveal from "./motion/TextReveal";
@@ -31,10 +31,17 @@ const socials = [
 ];
 
 const fields = [
-  { id: "name", label: "Name", type: "text" as const },
-  { id: "email", label: "Work email", type: "email" as const },
-  { id: "company", label: "Company", type: "text" as const },
+  { id: "name", label: "Name", type: "text" as const, required: true },
+  { id: "email", label: "Work email", type: "email" as const, required: true },
+  { id: "company", label: "Company", type: "text" as const, required: false },
 ];
+
+/* Mirrors the categories used by the work grid, so an enquiry maps onto
+   something visible on the page. Kept in sync with the same list in
+   app/api/contact/route.ts, which rejects anything outside it. */
+const services = ["Platforms", "Websites", "AI/ML", "Mobile", "Other"];
+
+type Status = "idle" | "sending" | "sent" | "error";
 
 /** Circle and tick draw themselves on, rather than cutting in finished. */
 function DrawnCheck() {
@@ -67,13 +74,39 @@ function DrawnCheck() {
 }
 
 export default function Contact() {
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<Status>("idle");
+  const [error, setError] = useState("");
+  const sent = status === "sent";
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // Wire this up to an email service (Resend, Formspree, etc.) or your
-    // own API route. For now it just confirms locally.
-    setSent(true);
+    if (status === "sending") return;
+
+    const data = Object.fromEntries(new FormData(e.currentTarget));
+
+    setStatus("sending");
+    setError("");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        setError(result?.error ?? "Something went wrong. Please try again.");
+        setStatus("error");
+        return;
+      }
+
+      setStatus("sent");
+    } catch {
+      setError("We couldn't reach the server. Please check your connection.");
+      setStatus("error");
+    }
   }
 
   return (
@@ -142,7 +175,7 @@ export default function Contact() {
                 >
                   <DrawnCheck />
                   <p className="text-sm text-primary">
-                    Message received. We&apos;ll reply from contact@peer-consulting.com.
+                    Message received. We&apos;ll get back to you soon.
                   </p>
                 </motion.div>
               ) : (
@@ -165,15 +198,50 @@ export default function Contact() {
                       <motion.div key={field.id} variants={revealItem}>
                         <label htmlFor={field.id} className="text-xs text-muted">
                           {field.label}
+                          {!field.required && (
+                            <span className="text-muted/70"> (optional)</span>
+                          )}
                         </label>
                         <input
                           id={field.id}
+                          name={field.id}
                           type={field.type}
-                          required
-                          className="field surface-page hairline mt-1 w-full rounded-card border px-3 py-2 text-sm text-primary"
+                          required={field.required}
+                          disabled={status === "sending"}
+                          className="field surface-page hairline mt-1 w-full rounded-card border px-3 py-2 text-sm text-primary disabled:opacity-60"
                         />
                       </motion.div>
                     ))}
+
+                    <motion.div variants={revealItem}>
+                      <label htmlFor="service" className="text-xs text-muted">
+                        Service
+                      </label>
+                      <div className="relative mt-1">
+                        <select
+                          id="service"
+                          name="service"
+                          required
+                          defaultValue=""
+                          disabled={status === "sending"}
+                          className="field field-select surface-page hairline w-full appearance-none rounded-card border px-3 py-2 pr-9 text-sm text-primary disabled:opacity-60"
+                        >
+                          <option value="" disabled>
+                            Select a service
+                          </option>
+                          {services.map((service) => (
+                            <option key={service} value={service}>
+                              {service}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown
+                          size={15}
+                          aria-hidden="true"
+                          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted"
+                        />
+                      </div>
+                    </motion.div>
 
                     <motion.div variants={revealItem}>
                       <label htmlFor="message" className="text-xs text-muted">
@@ -181,26 +249,56 @@ export default function Contact() {
                       </label>
                       <textarea
                         id="message"
+                        name="message"
                         required
                         rows={4}
-                        className="field surface-page hairline mt-1 w-full resize-none rounded-card border px-3 py-2 text-sm text-primary"
+                        disabled={status === "sending"}
+                        className="field surface-page hairline mt-1 w-full resize-none rounded-card border px-3 py-2 text-sm text-primary disabled:opacity-60"
                       />
                     </motion.div>
+
+                    {/* Honeypot. Hidden from people and from screen readers,
+                        but a bot filling every field will trip it. */}
+                    <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                      <label htmlFor="website">Leave this field empty</label>
+                      <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+                    </div>
 
                     <motion.button
                       variants={revealItem}
                       type="submit"
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.98 }}
+                      disabled={status === "sending"}
+                      whileHover={status === "sending" ? undefined : { y: -2 }}
+                      whileTap={status === "sending" ? undefined : { scale: 0.98 }}
                       transition={SPRING.pointer}
-                      className="sheen group flex items-center justify-center gap-2 btn-accent rounded-card px-4 py-2 text-sm font-medium"
+                      className="sheen group flex items-center justify-center gap-2 btn-accent rounded-card px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-70"
                     >
-                      Send message
-                      <Send
-                        size={15}
-                        className="transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                      />
+                      {status === "sending" ? "Sending…" : "Send message"}
+                      {status === "sending" ? (
+                        <Loader2 size={15} className="animate-spin" />
+                      ) : (
+                        <Send
+                          size={15}
+                          className="transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                        />
+                      )}
                     </motion.button>
+
+                    <AnimatePresence>
+                      {status === "error" && error && (
+                        <motion.p
+                          key="error"
+                          role="alert"
+                          initial={{ opacity: 0, y: -6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.3, ease: EASE.out }}
+                          className="text-xs text-red-500"
+                        >
+                          {error}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
                 </motion.form>
               )}

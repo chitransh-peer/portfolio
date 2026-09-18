@@ -13,7 +13,6 @@ import ThemeToggle from "./ThemeToggle";
 import { EASE, SPRING, revealGroup, revealItem } from "@/lib/motion";
 
 const links = [
-  { href: "#about", label: "About" },
   { href: "#projects", label: "Work" },
   { href: "#skills", label: "Services" },
   { href: "#contact", label: "Contact" },

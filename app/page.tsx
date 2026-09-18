@@ -1,6 +1,5 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import About from "@/components/About";
 import ProjectsSection from "@/components/ProjectsSection";
 import FeaturedProject from "@/components/FeaturedProject";
 import SkillsSection from "@/components/SkillsSection";
@@ -21,7 +20,6 @@ export default function Home() {
       <main id="main" tabIndex={-1} className="relative min-h-screen">
         <Navbar />
         <Hero />
-        <About />
         <ProjectsSection />
         <FeaturedProject />
         <SkillsSection />

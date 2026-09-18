@@ -282,6 +282,26 @@ body {
 }
 
 /* ------------------------------------------------------------------
+   Hero sizing
+   Fills exactly one viewport minus the sticky header, so the next
+   section never peeks above the fold and the scroll cue pinned to the
+   hero's bottom edge stays on screen. The vh line is a fallback for
+   browsers without svh; svh avoids the mobile URL-bar jump.
+   ------------------------------------------------------------------ */
+.hero-viewport {
+  --nav-h: 69px;
+  min-height: calc(100vh - var(--nav-h));
+  min-height: calc(100svh - var(--nav-h));
+}
+
+@media (min-width: 640px) {
+  .hero-viewport {
+    /* The logo steps up from h-9 to h-12 at this breakpoint. */
+    --nav-h: 81px;
+  }
+}
+
+/* ------------------------------------------------------------------
    Hero headline: glow field, accent keyword, typing caret
    ------------------------------------------------------------------ */
 .hero-glow {
@@ -453,6 +473,21 @@ body.dark .card-lift:hover {
   outline: none;
   border-color: rgb(var(--signal-rgb));
   box-shadow: 0 0 0 3px rgb(var(--signal-rgb) / 0.16);
+}
+
+/* The placeholder <option> has an empty value, so :invalid doubles as
+   "nothing chosen yet" and greys the select to match a real placeholder. */
+.field-select:invalid {
+  color: rgb(var(--muted-rgb));
+}
+
+/* Lets the OS render native dropdown menus to match the active theme. */
+:root {
+  color-scheme: light;
+}
+
+body.dark {
+  color-scheme: dark;
 }
 
 /* ------------------------------------------------------------------

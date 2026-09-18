@@ -31,11 +31,13 @@ export default function Hero() {
     <section
       id="top"
       ref={ref}
-      className="surface-page--sheer relative overflow-hidden"
+      className="hero-viewport surface-page--sheer relative flex flex-col justify-center overflow-hidden"
     >
+      {/* Padding is now a floor rather than the sizer — the section centres
+          its content, and the padding only kicks in on short viewports. */}
       <motion.div
         style={{ y: contentY, opacity: contentOpacity }}
-        className="mx-auto flex max-w-4xl flex-col items-center px-6 py-28 text-center md:py-40"
+        className="mx-auto flex w-full max-w-4xl flex-col items-center px-6 py-20 text-center md:py-24"
       >
         <motion.p
           className="mb-6 flex items-center gap-2.5 text-sm text-muted"
@@ -47,7 +49,7 @@ export default function Hero() {
             <span className="pulse-ring absolute inset-0 rounded-full text-success" />
             <span className="relative h-1.5 w-1.5 rounded-full bg-success" />
           </span>
-          Women-owned • Princeton, NJ • Serving NJ, NY & CT
+          Women-owned • Princeton, NJ
         </motion.p>
 
         <div className="relative">
@@ -67,9 +69,9 @@ export default function Hero() {
           animate={typed ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
           transition={{ duration: 0.7, ease: EASE.out, delay: 0.1 }}
         >
-          From strategy to execution, we help organizations across New Jersey,
-          New York, and Connecticut build smarter, scale faster, and stay
-          ahead. Here is a look at what we have been building.
+          From strategy to execution, we help organizations modernize their
+          systems, scale faster, and stay ahead of what comes next. Here is a
+          look at what we have been building.
         </motion.p>
 
         <motion.div
@@ -96,10 +98,10 @@ export default function Hero() {
           <motion.div variants={revealItem}>
             <Magnetic strength={0.25}>
               <a
-                href="#about"
+                href="#skills"
                 className="hairline block rounded-card border px-5 py-2.5 text-sm font-medium text-primary transition-colors duration-300 hover:border-signal hover:text-signal"
               >
-                About us
+                Our services
               </a>
             </Magnetic>
           </motion.div>
@@ -113,8 +115,8 @@ export default function Hero() {
         className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 md:block"
       >
         <motion.a
-          href="#about"
-          aria-label="Scroll to the about section"
+          href="#projects"
+          aria-label="Scroll to our work"
           className="flex flex-col items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-muted transition-colors hover:text-signal"
           initial={{ opacity: 0, y: -8 }}
           animate={typed ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
