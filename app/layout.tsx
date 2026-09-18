@@ -34,14 +34,15 @@ export const metadata: Metadata = {
 };
 
 /**
- * Applies the stored theme before first paint. Without this the page
- * renders dark and then flips, which is the one transition nobody wants.
+ * Light is the default, so this only has to opt a returning visitor back
+ * into dark — and it has to run before first paint, or they'd watch the
+ * page flash light before flipping.
  */
 const themeScript = `
 (function () {
   try {
-    if (localStorage.getItem('theme') === 'light') {
-      document.body.classList.add('light');
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark');
     }
   } catch (e) {}
 })();
@@ -56,6 +57,9 @@ export default function RootLayout({
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body className="font-sans antialiased" suppressHydrationWarning>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
         <Providers>{children}</Providers>
       </body>
     </html>

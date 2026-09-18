@@ -8,15 +8,17 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import AmbientBackground from "@/components/AmbientBackground";
 import ScrollProgress from "@/components/ScrollProgress";
+import SmoothScroll from "@/components/SmoothScroll";
 
 export default function Home() {
   return (
     <>
+      <SmoothScroll />
       <AmbientBackground />
       <ScrollProgress />
       {/* `relative` with no z-index keeps this above the fixed ambient
           layer without trapping the modal in a stacking context. */}
-      <main className="relative min-h-screen">
+      <main id="main" tabIndex={-1} className="relative min-h-screen">
         <Navbar />
         <Hero />
         <About />

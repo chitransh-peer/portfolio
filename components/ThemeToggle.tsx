@@ -11,25 +11,26 @@ type ViewTransitionDocument = Document & {
 };
 
 export default function ThemeToggle() {
-  const [isLight, setIsLight] = useState(false);
+  /* Light is the default, so dark is the state worth tracking. */
+  const [isDark, setIsDark] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const reduced = useReducedMotion();
 
   useEffect(() => {
-    setIsLight(document.body.classList.contains("light"));
+    setIsDark(document.body.classList.contains("dark"));
   }, []);
 
-  function applyTheme(light: boolean) {
-    document.body.classList.toggle("light", light);
-    window.localStorage.setItem("theme", light ? "light" : "dark");
+  function applyTheme(dark: boolean) {
+    document.body.classList.toggle("dark", dark);
+    window.localStorage.setItem("theme", dark ? "dark" : "light");
   }
 
   function toggle() {
-    const next = !isLight;
+    const next = !isDark;
     const doc = document as ViewTransitionDocument;
 
     if (reduced || !doc.startViewTransition || !buttonRef.current) {
-      setIsLight(next);
+      setIsDark(next);
       applyTheme(next);
       return;
     }
@@ -46,7 +47,7 @@ export default function ThemeToggle() {
 
     const transition = doc.startViewTransition(() => {
       // flushSync so the DOM is fully updated before the snapshot is taken.
-      flushSync(() => setIsLight(next));
+      flushSync(() => setIsDark(next));
       applyTheme(next);
     });
 
@@ -71,7 +72,7 @@ export default function ThemeToggle() {
     <motion.button
       ref={buttonRef}
       onClick={toggle}
-      aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       whileHover={{ scale: 1.08 }}
       whileTap={{ scale: 0.9 }}
       transition={SPRING.pointer}
@@ -79,14 +80,14 @@ export default function ThemeToggle() {
     >
       <AnimatePresence initial={false} mode="wait">
         <motion.span
-          key={isLight ? "moon" : "sun"}
+          key={isDark ? "sun" : "moon"}
           initial={{ y: 14, opacity: 0, rotate: -60 }}
           animate={{ y: 0, opacity: 1, rotate: 0 }}
           exit={{ y: -14, opacity: 0, rotate: 60 }}
           transition={{ duration: 0.28, ease: EASE.out }}
           className="flex items-center justify-center"
         >
-          {isLight ? <Moon size={16} /> : <Sun size={16} />}
+          {isDark ? <Sun size={16} /> : <Moon size={16} />}
         </motion.span>
       </AnimatePresence>
     </motion.button>

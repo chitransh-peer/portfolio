@@ -1,5 +1,7 @@
 import SectionLabel from "./motion/SectionLabel";
 import TextReveal from "./motion/TextReveal";
+import CountUp from "./motion/CountUp";
+import Marquee from "./motion/Marquee";
 import { Reveal, RevealGroup, RevealItem } from "./motion/Reveal";
 
 /* The numbers we lead with in conversations — kept here so the grid and
@@ -63,9 +65,10 @@ export default function About() {
         >
           {stats.map((stat) => (
             <RevealItem key={stat.label} className="surface-card hairline rounded-card border p-5">
-              <p className="font-display text-3xl font-medium text-signal">
-                {stat.value}
-              </p>
+              <CountUp
+                value={stat.value}
+                className="block font-display text-3xl font-medium text-signal"
+              />
               <p className="mt-1 text-xs text-muted">{stat.label}</p>
             </RevealItem>
           ))}
@@ -85,16 +88,12 @@ export default function About() {
           </Reveal>
         </div>
 
-        <RevealGroup stagger={0.05} delayChildren={0.1} className="mt-6 flex flex-wrap gap-2">
-          {industries.map((industry) => (
-            <RevealItem
-              key={industry}
-              className="hairline rounded-card border px-3 py-1.5 font-mono text-xs text-primary"
-            >
-              {industry}
-            </RevealItem>
-          ))}
-        </RevealGroup>
+        <Reveal delay={0.1} y={16} className="mt-6">
+          <Marquee
+            items={industries}
+            itemClassName="hairline block whitespace-nowrap rounded-card border px-3 py-1.5 font-mono text-xs text-primary transition-colors duration-300 hover:border-signal hover:text-signal"
+          />
+        </Reveal>
       </div>
     </section>
   );

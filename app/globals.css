@@ -8,12 +8,14 @@
    (bg-signal/10) and hand-written rgb(... / .3) both work off one
    source. Light mode only has to redefine the channels.
    ------------------------------------------------------------------ */
+/* Light is the default theme — it lives on bare :root so the page is
+   correct before any JS runs. `body.dark` is the opt-in override. */
 :root {
-  --page-rgb: 13 14 16;
-  --surface-rgb: 26 28 31;
-  --hairline-rgb: 42 45 49;
-  --primary-rgb: 244 242 236;
-  --muted-rgb: 139 141 147;
+  --page-rgb: 244 242 236;
+  --surface-rgb: 255 255 255;
+  --hairline-rgb: 227 224 214;
+  --primary-rgb: 13 14 16;
+  --muted-rgb: 107 109 115;
 
   /* Warm amber carries the UI: borders, links, buttons, focus. */
   --signal-rgb: 232 163 61;
@@ -33,26 +35,6 @@
   --dur-3: 400ms;
   --dur-4: 650ms;
 
-  --grid-line: rgba(255, 255, 255, 0.045);
-  --glow-signal: 0.22;
-  --glow-cool: 0.14;
-  --grain-opacity: 0.035;
-  --spotlight-alpha: 0.1;
-}
-
-body.light {
-  --page-rgb: 244 242 236;
-  --surface-rgb: 255 255 255;
-  --hairline-rgb: 227 224 214;
-  --primary-rgb: 13 14 16;
-  --muted-rgb: 107 109 115;
-
-  --signal-rgb: 232 163 61;
-  --on-signal-rgb: 13 14 16;
-
-  --success-rgb: 95 174 121;
-  --upcoming-rgb: 107 110 118;
-
   --grid-line: rgba(13, 14, 16, 0.05);
   --glow-signal: 0.28;
   --glow-cool: 0.16;
@@ -60,10 +42,61 @@ body.light {
   --spotlight-alpha: 0.14;
 }
 
+body.dark {
+  --page-rgb: 13 14 16;
+  --surface-rgb: 26 28 31;
+  --hairline-rgb: 42 45 49;
+  --primary-rgb: 244 242 236;
+  --muted-rgb: 139 141 147;
+
+  --signal-rgb: 232 163 61;
+  --on-signal-rgb: 13 14 16;
+
+  --success-rgb: 95 174 121;
+  --upcoming-rgb: 107 110 118;
+
+  --grid-line: rgba(255, 255, 255, 0.045);
+  --glow-signal: 0.22;
+  --glow-cool: 0.14;
+  --grain-opacity: 0.035;
+  --spotlight-alpha: 0.1;
+}
+
 html {
   scroll-behavior: smooth;
   /* Sticky navbar is ~65px — keep anchor targets clear of it. */
   scroll-padding-top: 6rem;
+}
+
+/* Lenis drives scrolling itself on desktop; native smooth scrolling
+   fights it and produces a stutter, so it's switched off while active. */
+html.lenis {
+  scroll-behavior: auto;
+}
+
+html.lenis body {
+  min-height: 100%;
+}
+
+/* ------------------------------------------------------------------
+   Skip link — off-canvas until focused
+   ------------------------------------------------------------------ */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background-color: rgb(var(--signal-rgb));
+  color: rgb(var(--on-signal-rgb));
+  font-size: 14px;
+  font-weight: 500;
+  transition: top var(--dur-3) var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  top: 16px;
 }
 
 body {
@@ -262,42 +295,42 @@ body {
   filter: blur(64px);
   background: radial-gradient(
     ellipse at center,
-    rgb(var(--signal-rgb) / 0.26) 0%,
-    rgb(var(--signal-rgb) / 0.09) 40%,
-    transparent 72%
-  );
-  animation: hero-glow-pulse 7s var(--ease-in-out) infinite;
-}
-
-body.light .hero-glow {
-  background: radial-gradient(
-    ellipse at center,
     rgb(var(--signal-rgb) / 0.34) 0%,
     rgb(var(--signal-rgb) / 0.12) 40%,
     transparent 72%
   );
+  /* Drifts as well as breathes, so the field never sits perfectly still. */
+  animation: hero-glow-drift 14s var(--ease-in-out) infinite alternate;
 }
 
-@keyframes hero-glow-pulse {
-  0%,
-  100% {
+body.dark .hero-glow {
+  background: radial-gradient(
+    ellipse at center,
+    rgb(var(--signal-rgb) / 0.26) 0%,
+    rgb(var(--signal-rgb) / 0.09) 40%,
+    transparent 72%
+  );
+}
+
+@keyframes hero-glow-drift {
+  from {
     opacity: 0.72;
     transform: translate(-50%, -50%) scale(1);
   }
-  50% {
+  to {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1.1);
+    transform: translate(calc(-50% + 6%), calc(-50% + 5%)) scale(1.07);
   }
 }
 
 /* Highlighted keyword inside the headline. */
 .accent-glow {
   color: rgb(var(--signal-rgb));
-  text-shadow: 0 0 32px rgb(var(--signal-rgb) / 0.5);
+  text-shadow: 0 0 26px rgb(var(--signal-rgb) / 0.42);
 }
 
-body.light .accent-glow {
-  text-shadow: 0 0 26px rgb(var(--signal-rgb) / 0.42);
+body.dark .accent-glow {
+  text-shadow: 0 0 32px rgb(var(--signal-rgb) / 0.5);
 }
 
 /* Caret sized in em so it tracks the headline's responsive font size. */
@@ -400,13 +433,13 @@ body.light .accent-glow {
 }
 
 .card-lift:hover {
-  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.65),
-    0 0 0 1px rgb(var(--signal-rgb) / 0.18);
-}
-
-body.light .card-lift:hover {
   box-shadow: 0 18px 40px -20px rgba(13, 14, 16, 0.22),
     0 0 0 1px rgb(var(--signal-rgb) / 0.28);
+}
+
+body.dark .card-lift:hover {
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgb(var(--signal-rgb) / 0.18);
 }
 
 /* Form fields: replace the generic focus outline with a signal ring that
@@ -420,6 +453,43 @@ body.light .card-lift:hover {
   outline: none;
   border-color: rgb(var(--signal-rgb));
   box-shadow: 0 0 0 3px rgb(var(--signal-rgb) / 0.16);
+}
+
+/* ------------------------------------------------------------------
+   Capability marquee — one seamless infinite scroll
+   The track holds the list twice; translating exactly -50% lands copy
+   two where copy one started, so the loop has no visible seam.
+   ------------------------------------------------------------------ */
+.marquee {
+  position: relative;
+  overflow: hidden;
+  /* Fades both ends so items enter and leave instead of being cut off. */
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 0.5rem;
+  animation: marquee-scroll var(--marquee-duration, 42s) linear infinite;
+}
+
+.marquee-track--reverse {
+  animation-direction: reverse;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
 }
 
 /* Status dot halo for live/in-progress work. */
@@ -509,8 +579,16 @@ body.light .card-lift:hover {
   .film-grain,
   .hero-glow,
   .pulse-ring::after,
-  .type-caret {
+  .type-caret,
+  .marquee-track {
     animation: none !important;
+  }
+
+  /* A paused marquee would clip its second copy off-screen, so let the
+     track wrap into a normal readable row instead. */
+  .marquee-track {
+    flex-wrap: wrap;
+    width: 100%;
   }
 
   .film-grain {
@@ -521,14 +599,14 @@ body.light .card-lift:hover {
 /* Logo swap. The lockup ships as two PNGs — white type for the dark
    theme, original navy for the light one — toggled here rather than in
    React so the correct cut is painted on the first frame. */
-.logo-on-light {
+.logo-on-dark {
   display: none;
 }
 
-body.light .logo-on-light {
+body.dark .logo-on-dark {
   display: block;
 }
 
-body.light .logo-on-dark {
+body.dark .logo-on-light {
   display: none;
 }
