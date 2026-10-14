@@ -14,6 +14,8 @@ export interface Project {
   githubUrl?: string;
   demoUrl?: string;
   featured?: boolean;
+  // Kept in the data but left out of every part of the UI.
+  hidden?: boolean;
   features?: string[];
   achievements?: string[];
 }

@@ -5,7 +5,7 @@ import { Project } from "@/lib/types";
 //
 // Ordering is deliberate: the applications we built and run come first,
 // then the client-facing websites.
-export const projects: Project[] = [
+const allProjects: Project[] = [
   {
     slug: "itil-elearning",
     name: "ITIL eLearning",
@@ -42,6 +42,31 @@ export const projects: Project[] = [
     stack: ["ITSM", "ITIL", "Asset Management"],
     thumbnail: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80",
     demoUrl: "https://glpi.peer-consulting.com",
+    hidden: true,
+  },
+  {
+    slug: "oath-it-service-desk",
+    name: "OATH IT Service Desk",
+    summary: "An ITSM solution for daily operations, requirement workflows, and project WBS.",
+    description:
+      "A comprehensive ITSM solution for tracking daily operations, requirement workflows, and project WBS management.",
+    category: "other",
+    status: "completed",
+    stack: ["ITSM", "Workflows", "WBS"],
+    thumbnail: "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&q=80",
+    demoUrl: "https://oath-itsm.peer-consulting.com/",
+  },
+  {
+    slug: "incident-management-system",
+    name: "Incident Management System",
+    summary: "An IT service portal for field equipment management and incident resolution.",
+    description:
+      "A dedicated IT service and support portal streamlining field equipment management and incident resolution.",
+    category: "other",
+    status: "completed",
+    stack: ["ITSM", "Incident Management", "Field Equipment"],
+    thumbnail: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+    demoUrl: "https://itsm.peer-consulting.com/",
   },
   {
     slug: "it-service-ticket-automation",
@@ -142,3 +167,5 @@ export const projects: Project[] = [
     demoUrl: "https://resolutetitleservices.com",
   },
 ];
+
+export const projects: Project[] = allProjects.filter((p) => !p.hidden);
