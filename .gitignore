@@ -5,7 +5,6 @@ out
 # Deliberately tracked so collaborators on this private repo get working
 # credentials with the clone. Must be re-ignored if the repo ever goes
 # public — and the Apps Script secret rotated, since it stays in history.
-!.env.local
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts
